@@ -5,32 +5,54 @@ class Program
 {
     static void Main(string[] args)
     {
-        bool exit = false;
+        // Optional: Seed database only if empty
+        LibCollection.populateCollection();
 
-        while (!exit)
+        while (true)
         {
-            Console.WriteLine("\n==== Library Management ====");
-            Console.WriteLine("1. Add Resource");
-            Console.WriteLine("2. List All Resources");
+            Console.Clear();
+            Console.WriteLine("=== Library Manager ===");
+            Console.WriteLine("1. View all resources");
+            Console.WriteLine("2. Add new resource");
+            Console.WriteLine("3. Edit resource");
+            Console.WriteLine("4. Delete resource");
+            Console.WriteLine("5. Borrow resource");
+            Console.WriteLine("6. Return resource");
+            Console.WriteLine("7. Search resources");
             Console.WriteLine("0. Exit");
-            Console.WriteLine("Choose an option: ");
+            Console.Write("Choose an option: ");
 
-            string choice = Console.ReadLine();
-
+            var choice = Console.ReadLine();
 
             switch (choice)
             {
                 case "1":
-                    ResourceOperations.AddResource();
-                    break;
-                case "2":
                     ResourceOperations.ListResources();
                     break;
-                case "0":
-                    exit = true;
+                case "2":
+                    ResourceOperations.AddResource();
                     break;
+                case "3":
+                    ResourceOperations.EditResource();
+                    break;
+                case "4":
+                    ResourceOperations.DeleteResource();
+                    break;
+                case "5":
+                    ResourceOperations.BorrowResource();
+                    break;
+                case "6":
+                    ResourceOperations.ReturnResource();
+                    break;
+                case "7":
+                    ResourceOperations.SearchResources();
+                    break;
+                case "0":
+                    Console.WriteLine("Goodbye!");
+                    return;
                 default:
-                    Console.WriteLine("Invalid option. Try again.");
+                    Console.WriteLine("Invalid choice. Press Enter to try again...");
+                    Console.ReadLine();
                     break;
             }
         }
