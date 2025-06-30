@@ -22,6 +22,8 @@ class Program
             Console.WriteLine("8. Generate Resources by Category Report");
             Console.WriteLine("9. Generate Overdue Items Report");
             Console.WriteLine("10. Search by title");
+            Console.WriteLine("11. Search by author");
+            Console.WriteLine("12. Search by genre");
             Console.WriteLine("0. Exit");
             Console.Write("Choose an option: ");
 
@@ -58,6 +60,12 @@ class Program
                     break;
                 case "10":
                     SearchManager.SearchByTitle();
+                    break;
+                case "11":
+                    SearchManager.SearchByAuthor();
+                    break;
+                case "12":
+                    SearchManager.SearchByGenre();
                     break;
                 case "0":
                     Console.WriteLine("Goodbye!");

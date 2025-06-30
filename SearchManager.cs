@@ -20,6 +20,36 @@ public static class SearchManager
         }
     }
 
+    public static void SearchByAuthor()
+    {
+        Console.Write("Enter author keyword: ");
+        string keyword = Console.ReadLine()?.Trim().ToLower();
+
+        using (var context = new LibraryContext())
+        {
+            var results = context.Resources
+                .Where(r => r.Author.ToLower().Contains(keyword))
+                .ToList();
+
+            DisplayResults(results, "author", keyword);
+        }
+    }
+
+    public static void SearchByGenre()
+    {
+        Console.Write("Enter genre keyword: ");
+        string keyword = Console.ReadLine()?.Trim().ToLower();
+
+        using (var context = new LibraryContext())
+        {
+            var results = context.Resources
+                .Where(r => r.Genre.ToLower().Contains(keyword))
+                .ToList();
+
+            DisplayResults(results, "genre", keyword);
+        }
+    }
+
 
     public static void DisplayResults(System.Collections.Generic.List<Resource> results, string field, string keyword)
     {
@@ -34,7 +64,7 @@ public static class SearchManager
             Console.WriteLine($"- {res.Title} by {res.Author} ({res.PublicationYear}) - Genre: {res.Genre}");
         }
 
-         Console.WriteLine("\nPress Enter to return to the menu...");
-            Console.ReadLine();//Pause, so user can read the list
+        Console.WriteLine("\nPress Enter to return to the menu...");
+        Console.ReadLine();//Pause, so user can read the list
     }
 }
