@@ -21,6 +21,7 @@ class Program
             Console.WriteLine("7. Search resources");
             Console.WriteLine("8. Generate Resources by Category Report");
             Console.WriteLine("9. Generate Overdue Items Report");
+            Console.WriteLine("10. Search by title");
             Console.WriteLine("0. Exit");
             Console.Write("Choose an option: ");
 
@@ -54,6 +55,9 @@ class Program
                     break;
                 case "9":
                     ReportManager.GenerateOverdueReport();
+                    break;
+                case "10":
+                    SearchManager.SearchByTitle();
                     break;
                 case "0":
                     Console.WriteLine("Goodbye!");
