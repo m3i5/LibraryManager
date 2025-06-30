@@ -19,6 +19,8 @@ class Program
             Console.WriteLine("5. Borrow resource");
             Console.WriteLine("6. Return resource");
             Console.WriteLine("7. Search resources");
+            Console.WriteLine("8. Generate Resources by Category Report");
+            Console.WriteLine("9. Generate Overdue Items Report");
             Console.WriteLine("0. Exit");
             Console.Write("Choose an option: ");
 
@@ -47,6 +49,12 @@ class Program
                 case "7":
                     ResourceOperations.SearchResources();
                     break;
+                case "8":
+                    ReportManager.GenerateResourceCategoryReport();
+                    break;
+                case "9":
+                    ReportManager.GenerateOverdueReport();
+                    break;
                 case "0":
                     Console.WriteLine("Goodbye!");
                     return;
@@ -55,7 +63,8 @@ class Program
                     Console.ReadLine();
                     break;
             }
-        }
         Console.WriteLine("Goodbye!");
+
+        }
     }
 }
