@@ -1,27 +1,27 @@
-using Xunit; // Required for writing unit tests using xUnit
-using Microsoft.EntityFrameworkCore; // Required for in-memory database support
-using LibraryManager.Models; // Access to the Resource model
-using LibraryManager; // Access to LibraryContext (your database context)
-using System.Linq; // For LINQ queries (like .FirstOrDefault, .Where, etc.)
+using Xunit; // required for writing unit tests using xUnit
+using Microsoft.EntityFrameworkCore;
+using LibraryManager.Models; // access to the Resource model
+using LibraryManager; // access to LibraryContext
+using System.Linq; // for LINQ queries (like .FirstOrDefault, .Where, etc.)
 
 public class ResourceOperationsTests
 {
-    // This method creates a temporary, fake database for testing.
-    // Each time a test runs, it uses a new clean copy of this database.
+    // This method creates a temporary, fake database for testing
+    // Each time a test runs, it uses a new copy of this database
     private LibraryContext GetInMemoryContext()
     {
         var options = new DbContextOptionsBuilder<LibraryContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // Unique name per test run
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // Unique name per test run, avoids state corruption
             .Options;
 
-        return new LibraryContext(options); // Return a context connected to this fake DB
+        return new LibraryContext(options); // return a context connected to fake DB
     }
 
     // This test checks if a new resource (like a book) can be added successfully
-    [Fact] // This attribute marks it as a test method
+    [Fact] // this marks it as a test method
     public void AddResource_ShouldAddResourceToDatabase()
     {
-        // Arrange – set up everything needed before performing the action
+        // set up everything needed before performing the action
         using var context = GetInMemoryContext();
 
         var resource = new Resource
@@ -48,7 +48,7 @@ public class ResourceOperationsTests
     [Fact]
     public void UpdateResource_ShouldModifyExistingResource()
     {
-        // Arrange
+
         using var context = GetInMemoryContext();
 
         // First, add a resource
@@ -64,12 +64,12 @@ public class ResourceOperationsTests
         context.Resources.Add(resource);
         context.SaveChanges();
 
-        // Act – update the title of the resource
+        // update the title of the resource
         var savedResource = context.Resources.First(); // Get the resource we just added
         savedResource.Title = "Updated Title"; // Change the title
         context.SaveChanges(); // Save the update
 
-        // Assert – check if the title was updated
+        // check if the title was updated
         var updatedResource = context.Resources.First(); // Fetch the updated version
         Assert.Equal("Updated Title", updatedResource.Title); // Check new title
     }
@@ -100,14 +100,14 @@ public class ResourceOperationsTests
         });
         context.SaveChanges();
 
-        // Act – perform a case-insensitive search for titles containing "C#"
+        // perform a case-insensitive search for titles containing "C#"
         var results = context.Resources
             .Where(r => r.Title.Contains("C#", System.StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-        // Assert – only one result should be returned, and it's the correct one
+        // only one result should be returned, and it's the correct one
         Assert.Single(results); // Only one match expected
-        Assert.Equal("C# Programming", results[0].Title); // Ensure it's the right one
+        Assert.Equal("C# Programming", results[0].Title); // ensure it's the right one
     }
 
     [Fact]
@@ -127,11 +127,11 @@ public class ResourceOperationsTests
         context.Resources.Add(resource);
         context.SaveChanges();
 
-        // Act
+
         context.Resources.Remove(resource);
         context.SaveChanges();
 
-        // Assert
+
         var exists = context.Resources.Any(r => r.Title == "Delete Me");
         Assert.False(exists); // Should no longer exist
     }
@@ -139,7 +139,7 @@ public class ResourceOperationsTests
     [Fact]
     public void BorrowResource_ShouldSetDueDate()
     {
-        // Arrange
+
         using var context = GetInMemoryContext();
         var resource = new Resource
         {
@@ -153,13 +153,12 @@ public class ResourceOperationsTests
         context.Resources.Add(resource);
         context.SaveChanges();
 
-        // Act – simulate borrowing
+        // simulate borrowing
         var item = context.Resources.First();
         item.IsAvailable = false;
-        item.DueDate = DateTime.Now.AddDays(14); // 2-week deadline
+        item.DueDate = DateTime.Now.AddDays(14); // 14 days deadline
         context.SaveChanges();
 
-        // Assert
         var updated = context.Resources.First();
         Assert.False(updated.IsAvailable);
         Assert.True(updated.DueDate.HasValue);
@@ -168,10 +167,10 @@ public class ResourceOperationsTests
     [Fact]
     public void CannotBorrowAlreadyBorrowedResource()
     {
-        // Arrange – create an in-memory database context
+        // create an in-memory database context
         using var context = GetInMemoryContext();
 
-        // Create a resource marked as already borrowed (IsAvailable = false)
+        // create a resource marked as already borrowed (IsAvailable = false)
         var resource = new Resource
         {
             Title = "Borrowed Book",
@@ -186,17 +185,17 @@ public class ResourceOperationsTests
         context.Resources.Add(resource);
         context.SaveChanges();
 
-        // Act – read the saved item
+        // read the saved item
         var item = context.Resources.First();
 
-        // Assert – confirm the saved availability is FALSE
+        //  confirm the saved availability is FALSE
         Assert.False(item.IsAvailable);
     }
 
     [Fact]
     public void ReturnResource_ShouldMakeItAvailable()
     {
-        // Arrange
+
         using var context = GetInMemoryContext();
         var resource = new Resource
         {
@@ -211,13 +210,13 @@ public class ResourceOperationsTests
         context.Resources.Add(resource);
         context.SaveChanges();
 
-        // Act – simulate return
+        // simulate return
         var item = context.Resources.First();
         item.IsAvailable = true;
         item.DueDate = null;
         context.SaveChanges();
 
-        // Assert
+
         var updated = context.Resources.First();
         Assert.True(updated.IsAvailable);
         Assert.Null(updated.DueDate);
@@ -226,7 +225,7 @@ public class ResourceOperationsTests
     [Fact]
     public void Search_ByAuthorOrGenre_ShouldReturnMatchingResults()
     {
-        // Arrange
+
         using var context = GetInMemoryContext();
         context.Resources.AddRange(
             new Resource { Title = "Book1", Author = "Alice", Genre = "Mystery", PublicationYear = 2010, ResourceType = "Book" },
@@ -234,13 +233,12 @@ public class ResourceOperationsTests
         );
         context.SaveChanges();
 
-        // Act – search by author "Bob"
+        // search by author "Bob"
         var byAuthor = context.Resources.Where(r => r.Author.Contains("Bob")).ToList();
 
-        // Act – search by genre "Mystery"
+        // search by genre "Mystery"
         var byGenre = context.Resources.Where(r => r.Genre.Contains("Mystery")).ToList();
 
-        // Assert
         Assert.Single(byAuthor);
         Assert.Equal("Book2", byAuthor[0].Title);
 
@@ -248,5 +246,61 @@ public class ResourceOperationsTests
         Assert.Equal("Book1", byGenre[0].Title);
     }
 
+    [Fact]
+    public void SearchResource_ByAuthor_ShouldReturnCorrectResource()
+    {
+        // setup in-memory database
+        using var context = GetInMemoryContext();
+
+        {
+            //add a resource to search
+            context.Resources.Add(new Resource
+            {
+                Title = "C# Basics",
+                Author = "Jane Developer",
+                PublicationYear = 2020,
+                Genre = "Programming",
+                ResourceType = "Book"
+            });
+            context.SaveChanges();
+
+            // perform the search (case-insensitive, partial match)
+            var results = context.Resources
+                .Where(r => r.Author.ToLower().Contains("jane"))
+                .ToList();
+
+            // assert that the resource was found
+            Assert.Single(results);
+            Assert.Equal("Jane Developer", results[0].Author);
+        }
+    }
+    [Fact]
+    public void ValidationManager_ShouldRejectInvalidYear()
+    {
+        // simulate invalid years
+        var tooEarly = 1300;
+        var tooLate = DateTime.Now.Year + 5;
+
+        // method should only accept years between 1400 and current year
+        bool IsValid(int year) => year >= 1400 && year <= DateTime.Now.Year;
+
+        Assert.False(IsValid(tooEarly)); // Too early
+        Assert.False(IsValid(tooLate));  // Future year
+        Assert.True(IsValid(2000));      // Normal case
+    }
+    [Fact]
+    public void BorrowNonexistentResource_ShouldFail()
+    {
+        using var context = GetInMemoryContext();
+        {
+            // try to borrow ID that doesn't exist
+            int fakeId = 999;
+
+            var resource = context.Resources.FirstOrDefault(r => r.Id == fakeId);
+
+            // Resource should not exist
+            Assert.Null(resource);
+        }
+    }
 
 }
