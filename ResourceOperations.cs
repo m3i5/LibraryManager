@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 public static class ResourceOperations
 {
+    // Displays all resources in the library
     public static void ListResources()
     {
         using (var context = new LibraryContext()) // Open a connection to the database
@@ -27,12 +28,14 @@ public static class ResourceOperations
 
         Console.WriteLine("\n--- Add New Resource ---");
 
+        //Get validated input from user
         string title = ValidationManager.ReadNonEmptyInput("Enter title: ");
         string author = ValidationManager.ReadNonEmptyInput("Enter author: ");
         int publicationYear = ValidationManager.ReadValidYear("Enter publication year: ");
         string genre = ValidationManager.ReadNonEmptyInput("Enter genre: ");
         string resourceType = ValidationManager.ReadValidType("Enter resource type (Book, Magazine, Journal): ");
 
+        //create new resource object
         var newResource = new Resource
         {
             Title = title,
@@ -43,6 +46,7 @@ public static class ResourceOperations
             IsAvailable = true
         };
 
+        //save to db
         using (var context = new LibraryContext())
         {
             context.Resources.Add(newResource);
@@ -53,90 +57,92 @@ public static class ResourceOperations
 
     }
 
+    //allows editing/updating an existing resource
     public static void UpdateResource()
-{
-    using (var context = new LibraryContext())
     {
-        // Ask user for the ID of the resource to edit
-        Console.Write("Enter ID of resource to edit: ");
-        bool parsed = int.TryParse(Console.ReadLine(), out int id);
-        if (!parsed || id <= 0)
+        using (var context = new LibraryContext())
         {
-            Console.WriteLine("Invalid ID entered.");
-            return;
-        }
+            // Ask user for the ID of the resource to edit
+            Console.Write("Enter ID of resource to edit: ");
+            bool parsed = int.TryParse(Console.ReadLine(), out int id);
+            if (!parsed || id <= 0)
+            {
+                Console.WriteLine("Invalid ID entered.");
+                return;
+            }
 
-        // Find resource by ID
-        var resource = context.Resources.FirstOrDefault(r => r.Id == id);
-        if (resource == null)
-        {
-            Console.WriteLine("Resource not found. Press Enter to continue...");
+            // Find resource by ID
+            var resource = context.Resources.FirstOrDefault(r => r.Id == id);
+            if (resource == null)
+            {
+                Console.WriteLine("Resource not found. Press Enter to continue...");
+                Console.ReadLine();
+                return;
+            }
+
+            Console.WriteLine("\nLeave field blank to keep current value.\n");
+
+            // Update Title
+            Console.Write($"Title ({resource.Title}): ");
+            var title = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(title))
+                resource.Title = title;
+
+            // Update Author
+            Console.Write($"Author ({resource.Author}): ");
+            var author = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(author))
+                resource.Author = author;
+
+            // Update Publication Year
+            Console.Write($"Year ({resource.PublicationYear}): ");
+            var yearInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(yearInput))
+            {
+                //checks for reasonable publication year
+                if (int.TryParse(yearInput, out int year) &&
+                    year >= 1400 && year <= DateTime.Now.Year)
+                {
+                    resource.PublicationYear = year;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid year. Keeping original.");
+                }
+            }
+
+            // Update Genre
+            Console.Write($"Genre ({resource.Genre}): ");
+            var genre = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(genre))
+                resource.Genre = genre;
+
+            // Update Resource Type with basic validation
+            Console.Write($"Type ({resource.ResourceType}) [Book/Magazine/Journal]: ");
+            var type = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                string[] validTypes = { "Book", "Magazine", "Journal" };
+                if (validTypes.Any(t => t.Equals(type, StringComparison.OrdinalIgnoreCase)))
+                {
+                    // Capitalize first letter for consistency
+                    resource.ResourceType = char.ToUpper(type[0]) + type.Substring(1).ToLower();
+                }
+                else
+                {
+                    Console.WriteLine("Invalid type. Keeping original.");
+                }
+            }
+
+            // Save changes to the database
+            context.SaveChanges();
+
+            Console.WriteLine("Resource updated successfully. Press Enter to continue...");
             Console.ReadLine();
-            return;
         }
-
-        Console.WriteLine("\nLeave field blank to keep current value.\n");
-
-        // Update Title
-        Console.Write($"Title ({resource.Title}): ");
-        var title = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(title))
-            resource.Title = title;
-
-        // Update Author
-        Console.Write($"Author ({resource.Author}): ");
-        var author = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(author))
-            resource.Author = author;
-
-        // Update Publication Year with validation
-        Console.Write($"Year ({resource.PublicationYear}): ");
-        var yearInput = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(yearInput))
-        {
-            if (int.TryParse(yearInput, out int year) &&
-                year >= 1400 && year <= DateTime.Now.Year)
-            {
-                resource.PublicationYear = year;
-            }
-            else
-            {
-                Console.WriteLine("Invalid year. Keeping original.");
-            }
-        }
-
-        // Update Genre
-        Console.Write($"Genre ({resource.Genre}): ");
-        var genre = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(genre))
-            resource.Genre = genre;
-
-        // Update Resource Type with basic validation
-        Console.Write($"Type ({resource.ResourceType}) [Book/Magazine/Journal]: ");
-        var type = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(type))
-        {
-            string[] validTypes = { "Book", "Magazine", "Journal" };
-            if (validTypes.Any(t => t.Equals(type, StringComparison.OrdinalIgnoreCase)))
-            {
-                // Capitalize first letter for consistency
-                resource.ResourceType = char.ToUpper(type[0]) + type.Substring(1).ToLower();
-            }
-            else
-            {
-                Console.WriteLine("Invalid type. Keeping original.");
-            }
-        }
-
-        // Save changes to the database
-        context.SaveChanges();
-
-        Console.WriteLine("Resource updated successfully. Press Enter to continue...");
-        Console.ReadLine();
     }
-}
 
-
+    //delete resource by id
     public static void DeleteResource()
     {
         using (var context = new LibraryContext())
@@ -187,7 +193,7 @@ public static class ResourceOperations
                 Console.Write("Enter number of days to borrow (default 14): ");
                 int days = int.TryParse(Console.ReadLine(), out var d) ? d : 14;
 
-                resource.IsAvailable = false; //update status
+                resource.IsAvailable = false; //update borrowing status
                 resource.BorrowedBy = borrower;
                 resource.DueDate = DateTime.Now.AddDays(days);
 
@@ -201,6 +207,7 @@ public static class ResourceOperations
     }
 
 
+    //change borrowing status to returned and clear borrower info
     public static void ReturnResource()
     {
         using (var context = new LibraryContext())

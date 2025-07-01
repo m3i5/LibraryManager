@@ -1,17 +1,18 @@
 using System;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using LibraryManager.Models;
 
 public static class SearchManager
 {
+    //searches for resource by title (partial match, case insensitive)
     public static void SearchByTitle()
     {
         Console.WriteLine("Enter title: ");
-        string keyword = Console.ReadLine()?.Trim().ToLower();
+        string keyword = Console.ReadLine()?.Trim().ToLower() ?? "";
 
         using (var context = new LibraryContext())
         {
+            //match title with partial match
             var results = context.Resources
                 .Where(r => r.Title.ToLower().Contains(keyword))
                 .ToList();
@@ -20,10 +21,11 @@ public static class SearchManager
         }
     }
 
+    //search resource by author name
     public static void SearchByAuthor()
     {
         Console.Write("Enter author keyword: ");
-        string keyword = Console.ReadLine()?.Trim().ToLower();
+        string keyword = Console.ReadLine()?.Trim().ToLower() ?? "";
 
         using (var context = new LibraryContext())
         {
@@ -35,10 +37,11 @@ public static class SearchManager
         }
     }
 
+    //search resource by genre
     public static void SearchByGenre()
     {
         Console.Write("Enter genre keyword: ");
-        string keyword = Console.ReadLine()?.Trim().ToLower();
+        string keyword = Console.ReadLine()?.Trim().ToLower() ?? "";
 
         using (var context = new LibraryContext())
         {
@@ -51,20 +54,24 @@ public static class SearchManager
     }
 
 
+    //display search results
     public static void DisplayResults(System.Collections.Generic.List<Resource> results, string field, string keyword)
     {
+        Console.WriteLine($"\nSearch results for {field}: \"{keyword}\"");
+
         if (!results.Any())
         {
-            Console.WriteLine("No matching resources.");
-            return;
+            Console.WriteLine("No matching resources found.");
         }
-
-        foreach (var res in results)
+        else
         {
-            Console.WriteLine($"- {res.Title} by {res.Author} ({res.PublicationYear}) - Genre: {res.Genre}");
+            foreach (var res in results)
+            {
+                Console.WriteLine($"- {res.Title} by {res.Author} ({res.PublicationYear}) - Genre: {res.Genre}, Type: {res.ResourceType}, Available: {(res.IsAvailable ? "Yes" : "No")}");
+            }
         }
 
         Console.WriteLine("\nPress Enter to return to the menu...");
-        Console.ReadLine();//Pause, so user can read the list
+        Console.ReadLine(); // Pause to allow the user to read the results
     }
 }
