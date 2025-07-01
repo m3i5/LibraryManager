@@ -11,7 +11,7 @@ public static class ReportManager
         // Create a new connection to the database
         using (var context = new LibraryContext())
         {
-            // Group all resources in the database by their ResourceType e.g Book, Magazine
+            // Group all resources in the database by their type e.g Book, Magazine
             var groupedResources = context.Resources
                 .GroupBy(r => r.ResourceType) // Group by type
                 .ToList(); // Execute query and get results
@@ -34,7 +34,7 @@ public static class ReportManager
         }
     }
 
-    // Report 2: List all overdue borrowed resources
+    // Report 2: List all overdue resources
     public static void GenerateOverdueReport()
     {
         // Open a database connection
