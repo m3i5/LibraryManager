@@ -5,6 +5,11 @@ class Program
 {
     static void Main(string[] args)
     {
+
+        //Clear database
+        //Used in development - KEEP COMMENTED OUT AT ALL TIMES!!!
+        //LibCollection.ClearDatabase();
+
         //Fill database only if empty
         LibCollection.populateCollection();
 
