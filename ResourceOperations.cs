@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using LibraryManager.Models;
+using Microsoft.EntityFrameworkCore;
 
 public static class ResourceOperations
 {
@@ -20,91 +21,120 @@ public static class ResourceOperations
         }
     }
 
+    // Adds a new resource to the library with input validation
     public static void AddResource()
     {
+
+        Console.WriteLine("\n--- Add New Resource ---");
+
+        string title = ValidationManager.ReadNonEmptyInput("Enter title: ");
+        string author = ValidationManager.ReadNonEmptyInput("Enter author: ");
+        int publicationYear = ValidationManager.ReadValidYear("Enter publication year: ");
+        string genre = ValidationManager.ReadNonEmptyInput("Enter genre: ");
+        string resourceType = ValidationManager.ReadValidType("Enter resource type (Book, Magazine, Journal): ");
+
+        var newResource = new Resource
+        {
+            Title = title,
+            Author = author,
+            PublicationYear = publicationYear,
+            Genre = genre,
+            ResourceType = resourceType,
+            IsAvailable = true
+        };
+
         using (var context = new LibraryContext())
         {
-            //Ask user for details one by one
-            Console.Write("Title: ");
-            var title = Console.ReadLine();
-
-            Console.Write("Author: ");
-            var author = Console.ReadLine();
-
-            Console.Write("Publication Year: ");
-            int year = int.TryParse(Console.ReadLine(), out var y) ? y : 0;
-
-            Console.Write("Genre: ");
-            var genre = Console.ReadLine();
-
-            Console.Write("Resource Type (Book, Magazine, Journal): ");
-            var type = Console.ReadLine();
-
-            //Create a new resource object and set properties
-            var newResource = new Resource
-            {
-                Title = title,
-                Author = author,
-                PublicationYear = year,
-                Genre = genre,
-                ResourceType = type,
-                IsAvailable = true //available by default
-            };
-
-            //Add resource to database and save changes
             context.Resources.Add(newResource);
             context.SaveChanges();
-
-            Console.WriteLine("Resource added. Press Enter to continue...");
-            Console.ReadLine();
         }
+
+        Console.WriteLine("Resource added successfully!");
+
     }
 
-    public static void EditResource()
+    public static void UpdateResource()
+{
+    using (var context = new LibraryContext())
     {
-        using (var context = new LibraryContext())
+        // Ask user for the ID of the resource to edit
+        Console.Write("Enter ID of resource to edit: ");
+        bool parsed = int.TryParse(Console.ReadLine(), out int id);
+        if (!parsed || id <= 0)
         {
-            //Ask for ID of resource to edit
-            Console.Write("Enter ID of resource to edit: ");
-            int id = int.TryParse(Console.ReadLine(), out var resId) ? resId : -1;
-
-            //Find resource by id
-            var resource = context.Resources.FirstOrDefault(r => r.Id == id);
-            if (resource == null)
-            {
-                Console.WriteLine("Resource not found. Press Enter to continue...");
-                Console.ReadLine();
-                return;
-            }
-
-            Console.WriteLine("Leave field blank to keep current value.\n");
-
-            //For each field show current value and allow user to modify it
-            Console.Write($"Title ({resource.Title}): ");
-            var title = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(title)) resource.Title = title;
-
-            Console.Write($"Author ({resource.Author}): ");
-            var author = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(author)) resource.Author = author;
-
-            Console.Write($"Year ({resource.PublicationYear}): ");
-            var yearInput = Console.ReadLine();
-            if (int.TryParse(yearInput, out var year)) resource.PublicationYear = year;
-
-            Console.Write($"Genre ({resource.Genre}): ");
-            var genre = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(genre)) resource.Genre = genre;
-
-            Console.Write($"Type ({resource.ResourceType}): ");
-            var type = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(type)) resource.ResourceType = type;
-
-            context.SaveChanges();
-            Console.WriteLine("Resource updated. Press Enter to continue...");
-            Console.ReadLine();
+            Console.WriteLine("Invalid ID entered.");
+            return;
         }
+
+        // Find resource by ID
+        var resource = context.Resources.FirstOrDefault(r => r.Id == id);
+        if (resource == null)
+        {
+            Console.WriteLine("Resource not found. Press Enter to continue...");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine("\nLeave field blank to keep current value.\n");
+
+        // Update Title
+        Console.Write($"Title ({resource.Title}): ");
+        var title = Console.ReadLine();
+        if (!string.IsNullOrWhiteSpace(title))
+            resource.Title = title;
+
+        // Update Author
+        Console.Write($"Author ({resource.Author}): ");
+        var author = Console.ReadLine();
+        if (!string.IsNullOrWhiteSpace(author))
+            resource.Author = author;
+
+        // Update Publication Year with validation
+        Console.Write($"Year ({resource.PublicationYear}): ");
+        var yearInput = Console.ReadLine();
+        if (!string.IsNullOrWhiteSpace(yearInput))
+        {
+            if (int.TryParse(yearInput, out int year) &&
+                year >= 1400 && year <= DateTime.Now.Year)
+            {
+                resource.PublicationYear = year;
+            }
+            else
+            {
+                Console.WriteLine("Invalid year. Keeping original.");
+            }
+        }
+
+        // Update Genre
+        Console.Write($"Genre ({resource.Genre}): ");
+        var genre = Console.ReadLine();
+        if (!string.IsNullOrWhiteSpace(genre))
+            resource.Genre = genre;
+
+        // Update Resource Type with basic validation
+        Console.Write($"Type ({resource.ResourceType}) [Book/Magazine/Journal]: ");
+        var type = Console.ReadLine();
+        if (!string.IsNullOrWhiteSpace(type))
+        {
+            string[] validTypes = { "Book", "Magazine", "Journal" };
+            if (validTypes.Any(t => t.Equals(type, StringComparison.OrdinalIgnoreCase)))
+            {
+                // Capitalize first letter for consistency
+                resource.ResourceType = char.ToUpper(type[0]) + type.Substring(1).ToLower();
+            }
+            else
+            {
+                Console.WriteLine("Invalid type. Keeping original.");
+            }
+        }
+
+        // Save changes to the database
+        context.SaveChanges();
+
+        Console.WriteLine("Resource updated successfully. Press Enter to continue...");
+        Console.ReadLine();
     }
+}
 
 
     public static void DeleteResource()

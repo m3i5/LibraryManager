@@ -38,7 +38,7 @@ class Program
                     ResourceOperations.AddResource();
                     break;
                 case "3":
-                    ResourceOperations.EditResource();
+                    ResourceOperations.UpdateResource();
                     break;
                 case "4":
                     ResourceOperations.DeleteResource();
