@@ -12,7 +12,7 @@ public static class ValidationManager
         do
         {
             Console.Write(prompt); //show prompt
-            input = Console.ReadLine()?.Trim(); //read input and remove extra whitespaces
+            input = Console.ReadLine()?.Trim() ?? ""; //read input and remove extra whitespaces
             if (string.IsNullOrEmpty(input))
             {
                 Console.WriteLine("Input cannot be empty. Please try again.");
@@ -31,7 +31,7 @@ public static class ValidationManager
         while (true)
         {
             Console.Write(prompt); //ask user for input
-            string input = Console.ReadLine();
+            string input = Console.ReadLine() ?? "";
 
             //parse and validate the year
             if (int.TryParse(input, out year) && year >= 1400 && year <= currentYear)
@@ -52,7 +52,7 @@ public static class ValidationManager
         while (true)
         {
             Console.Write(prompt);
-            input = Console.ReadLine()?.Trim();
+            input = Console.ReadLine()?.Trim() ?? "";
 
             //check if input matches any validType
             if (!string.IsNullOrEmpty(input) &&
