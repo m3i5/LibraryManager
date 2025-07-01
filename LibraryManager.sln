@@ -1,8 +1,10 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManager", "LibraryManager.csproj", "{FFEB6EB2-0A00-9C2E-3C12-A2E54F00EB31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManager.Tests", "LibraryManager.Tests\LibraryManager.Tests.csproj", "{95EF11C1-C64D-4B81-A57E-413E46CBC733}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,6 +16,10 @@ Global
 		{FFEB6EB2-0A00-9C2E-3C12-A2E54F00EB31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFEB6EB2-0A00-9C2E-3C12-A2E54F00EB31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFEB6EB2-0A00-9C2E-3C12-A2E54F00EB31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95EF11C1-C64D-4B81-A57E-413E46CBC733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95EF11C1-C64D-4B81-A57E-413E46CBC733}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95EF11C1-C64D-4B81-A57E-413E46CBC733}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95EF11C1-C64D-4B81-A57E-413E46CBC733}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
