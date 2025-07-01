@@ -231,10 +231,4 @@ public static class ResourceOperations
             Console.ReadLine();
         }
     }
-
-
-    public static void SearchResources()
-    {
-        // To be added after CRUD
-    }
 }
